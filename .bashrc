@@ -124,3 +124,4 @@ export NVM_DIR="$HOME/.nvm"
 
 eval "$(starship init bash)"
 
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
