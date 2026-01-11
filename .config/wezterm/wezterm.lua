@@ -10,6 +10,9 @@ config.window_decorations = "RESIZE"
 config.hide_tab_bar_if_only_one_tab = true
 config.initial_cols = 145
 config.initial_rows = 45
+config.keys = require("keybinds").keys
+config.key_tables = require("keybinds").key_tables
+config.disable_default_key_bindings = true
 
 config.window_frame = {
 	inactive_titlebar_bg = "none",
