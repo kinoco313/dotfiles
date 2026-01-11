@@ -8,8 +8,8 @@ config.use_ime = true
 config.window_background_opacity = 0.80
 config.window_decorations = "RESIZE"
 config.hide_tab_bar_if_only_one_tab = true
-config.initial_cols = 140
-config.initial_rows = 40
+config.initial_cols = 145
+config.initial_rows = 45
 
 config.window_frame = {
 	inactive_titlebar_bg = "none",
