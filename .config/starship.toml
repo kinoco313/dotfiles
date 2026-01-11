@@ -1,9 +1,8 @@
 add_newline = true
 
-# プロンプト全体のレイアウト
 format = """
 [░▒▓](#9A348E)\
-[ 🐧 Ubuntu ](bg:#9A348E fg:#FFFFFF)\
+$os\
 [](fg:#9A348E bg:#DA627D)\
 $directory\
 [](fg:#DA627D bg:#FCA17D)\
@@ -19,6 +18,15 @@ $time\
 \n$character
 """
 
+[os]
+disabled = false
+style = "bg:#9A348E fg:#FFFFFF"
+format = "[ $symbol ]($style)"
+
+[os.symbols]
+Ubuntu = "🐧 Ubuntu "
+Macos = "🍎 Mac "
+
 [directory]
 style = "bg:#DA627D fg:#FFFFFF"
 format = "[ $path ]($style)"
@@ -28,12 +36,10 @@ fish_style_pwd_dir_length = 1
 [git_branch]
 symbol = ""
 style = "bg:#FCA17D fg:#000000"
-# 二重の括弧 [[ ]] を [ ] に修正
 format = "[ $symbol $branch ]($style)"
 
 [git_status]
 style = "bg:#FCA17D fg:#000000"
-# 二重の括弧 [[ ]] を [ ] に修正
 format = "[($all_status$ahead_behind )]($style)"
 
 [python]
@@ -45,7 +51,6 @@ format = "[ $symbol ($version) ]($style)"
 disabled = false
 time_format = "%R"
 style = "bg:#33658A fg:#FFFFFF"
-# 二重の括弧 [[ ]] を [ ] に修正
 format = "[ 󱑎 $time ]($style)"
 
 [character]
