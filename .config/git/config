@@ -1,0 +1,45 @@
+[user]
+	# Set your name and email
+	# name = Your Name
+	# email = your@email.com
+
+[init]
+	defaultBranch = main
+
+[push]
+	autoSetupRemote = true
+
+[pull]
+	rebase = true
+
+[fetch]
+	prune = true
+
+[core]
+	pager = delta
+	excludesfile = ~/.config/git/ignore
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true
+	syntax-theme = Catppuccin Mocha
+
+[merge]
+	conflictstyle = zdiff3
+
+[diff]
+	colorMoved = default
+
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	ci = commit
+	lg = log --graph --oneline --decorate --all
+	unstage = reset HEAD --
+	last = log -1 HEAD
+	amend = commit --amend --no-edit
