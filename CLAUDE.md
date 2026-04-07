@@ -58,9 +58,169 @@ dotfiles/
 ## Deployment
 
 ```bash
-git clone <repo> ~/dotfiles
+git clone https://github.com/kkaoioi/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 bash install.sh
+exec zsh  # Load new config
 ```
 
 The install script handles: OS detection, Homebrew install, `brew bundle`, symlink creation, zsh as default shell, and sheldon plugin initialization.
+
+**Verify Installation:**
+- `echo $SHELL` → should show zsh path
+- `which eza bat rg fd z` → all should resolve
+- `nvim --version` → should show Neovim installed
+- `tmux -V` → should show tmux version
+
+## Common Workflows
+
+### Update Packages
+```bash
+cd ~/dotfiles
+brew update && brew upgrade
+```
+
+### Add New Package
+1. Add to `Brewfile`
+2. Run `brew bundle --file=~/dotfiles/Brewfile`
+3. Commit and push changes
+
+### Update Zsh Plugins
+```bash
+sheldon lock --update
+```
+
+### Test Changes
+Before committing config changes:
+```bash
+# For zsh changes
+exec zsh
+
+# For tmux changes
+tmux source ~/.config/tmux/tmux.conf
+
+# For Neovim changes (inside nvim)
+:Lazy sync
+```
+
+### Sync to New Machine
+```bash
+cd ~/dotfiles
+git pull
+bash install.sh
+exec zsh
+```
+
+## Customization
+
+### Add Zsh Plugin
+1. Edit `.config/sheldon/plugins.toml`
+2. Add plugin entry:
+   ```toml
+   [plugins.my-plugin]
+   github = "user/repo"
+   ```
+3. Run `sheldon lock` and `exec zsh`
+
+### Modify Neovim Config
+- Add plugins: `.config/nvim/lua/plugins/` (create new `.lua` file)
+- Modify settings: `.config/nvim/lua/config/options.lua`, `keymaps.lua`, etc.
+- Sync changes: `:Lazy sync` inside nvim
+
+### Change Theme
+Current: Catppuccin Mocha
+- Starship: `.config/starship.toml` (line with `palette =`)
+- tmux: `.config/tmux/tmux.conf` (catppuccin plugin section)
+- Neovim: LazyVim colorscheme config
+
+### Add Homebrew Package
+1. Edit `Brewfile`
+2. Add `brew "package-name"` or `cask "app-name"`
+3. Run `brew bundle --file=~/dotfiles/Brewfile`
+
+## Environment Details
+
+### Key Environment Variables
+- `ZDOTDIR="$HOME/.config/zsh"` - Zsh config location (set in `~/.zshenv`)
+- `HISTFILE="$HOME/.local/state/zsh/history"` - Zsh history location
+- `NVM_DIR="$HOME/.nvm"` - nvm installation directory
+- `FZF_DEFAULT_COMMAND` - fd integration for fzf
+
+### Directory Structure
+- `~/.config/` - All dotfile configs (symlinked from `~/dotfiles/.config/`)
+- `~/.local/state/zsh/` - Zsh runtime data (history)
+- `~/.zshenv` - Sets ZDOTDIR (created by install.sh)
+
+## Tool Integration
+
+### Zsh Plugin Loading Order
+Sheldon loads plugins in specific order (`.config/sheldon/plugins.toml`):
+1. `zsh-autosuggestions` - Command suggestions from history
+2. `zsh-completions` - Enhanced completions
+3. `compinit` - Initialize completion system
+4. `zsh-syntax-highlighting` - Must load last for proper highlighting
+
+### fzf + fd Integration
+- `Ctrl+T` - File search using fd (excludes .git)
+- `Ctrl+R` - Command history search
+- `Alt+C` - Directory jump using fd
+- Default command: `fd --type f --hidden --follow --exclude .git`
+
+### nvm (Lazy Load)
+Node Version Manager loads on first `nvm` command to improve shell startup time. Located in `.zshrc` lines 48+.
+
+### WezTerm + tmux
+- **WezTerm**: GPU-accelerated terminal emulator (custom keybinds in `.config/wezterm/keybinds.lua`)
+- **tmux**: Terminal multiplexer inside WezTerm (prefix: `Ctrl+a`)
+- Can be used independently or together (tmux for session persistence, WezTerm for rendering)
+
+## Gotchas
+
+- **ZDOTDIR**: The zsh config lives in `.config/zsh/`, not `~/.zshrc`. The install script sets `ZDOTDIR` in `~/.zshenv`.
+- **Symlinks overwrite**: `install.sh` will replace existing configs in `~/.config/`. Back up first if needed.
+- **Linux limitations**: Homebrew casks (GUI apps) are skipped on Ubuntu/Debian.
+- **New terminal required**: After install, run `exec zsh` or open a new terminal to load changes.
+- **zcompdump files**: Auto-generated `.zcompdump.*` files in `.config/zsh/` can be gitignored.
+
+## Troubleshooting
+
+### Sheldon plugins not loading
+```bash
+# Check sheldon is installed
+which sheldon
+
+# Re-lock plugins
+sheldon lock
+
+# Reload shell
+exec zsh
+```
+
+### Symlink conflicts
+```bash
+# Check what's linked
+ls -la ~/.config/zsh
+ls -la ~/.config/nvim
+
+# If conflicts exist, backup and re-run
+mv ~/.config/zsh ~/.config/zsh.backup
+cd ~/dotfiles && bash install.sh
+```
+
+### Commands not found after install
+```bash
+# Ensure brew is in PATH
+which brew
+
+# macOS
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Linux
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
+
+### zsh history not persisting
+Check `$HISTFILE` location: `~/.local/state/zsh/history`
+```bash
+mkdir -p ~/.local/state/zsh
+```
