@@ -67,3 +67,4 @@ npx() {
   [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
   npx "$@"
 }
+export PATH="$HOME/.local/bin:$PATH"

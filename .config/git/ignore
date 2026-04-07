@@ -27,3 +27,8 @@ node_modules/
 # Misc
 *.log
 .direnv/
+
+**/.claude/settings.local.json
+
+# Zsh
+.zcompdump*
