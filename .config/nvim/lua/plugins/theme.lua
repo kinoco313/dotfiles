@@ -1,0 +1,1 @@
+/home/kota/.config/omarchy/current/theme/neovim.lua

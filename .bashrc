@@ -1,127 +1,179 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
+[[ $- != *i* ]] && return
 
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
+if [[ "$(uname)" == "Linux" ]]; then
+  # On Linux with Omarchy, delegate everything to Omarchy's managed config
+  source ~/.local/share/omarchy/default/bash/rc
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
-
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
-
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-# set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
-esac
-
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-#force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
-    else
-	color_prompt=
-    fi
-fi
-
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+  # Use GPG agent as SSH agent
+  export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
+  # macOS: replicate Omarchy's environment manually
 
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+  # --- Env ---
+  export BAT_THEME=ansi
+  export PATH="$PATH:$HOME/.local/bin"
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+  # Homebrew env (Apple Silicon path)
+  [[ -f /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
 
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
+  # --- Shell ---
+  shopt -s histappend
+  HISTCONTROL=ignoreboth
+  HISTSIZE=32768
+  HISTFILESIZE="${HISTSIZE}"
+  set +h
 
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+  if [[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]]; then
+    source "$(brew --prefix)/etc/profile.d/bash_completion.sh"
+  fi
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+  # --- Aliases: Filesystem ---
+  if command -v eza &>/dev/null; then
+    alias ls='eza -lh --group-directories-first --icons=auto'
+    alias lsa='ls -a'
+    alias lt='eza --tree --level=2 --long --icons --git'
+    alias lta='lt -a'
+  fi
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+  alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
+  alias eff='$EDITOR "$(ff)"'
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+  if command -v zoxide &>/dev/null; then
+    alias cd="zd"
+    zd() {
+      if (( $# == 0 )); then
+        builtin cd ~ || return
+      elif [[ -d $1 ]]; then
+        builtin cd "$1" || return
+      else
+        if ! z "$@"; then
+          echo "Error: Directory not found"
+          return 1
+        fi
+        printf "\U000F17A9 "
+        pwd
+      fi
+    }
+  fi
 
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
+  # --- Aliases: Directories ---
+  alias ..='cd ..'
+  alias ...='cd ../..'
+  alias ....='cd ../../..'
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
+  # --- Aliases: Tools ---
+  alias cx='claude --allow-dangerously-skip-permissions'
+  alias d='docker'
+  alias r='rails'
+  alias t='tmux attach || tmux new -s Work'
+  n() { if [ "$#" -eq 0 ]; then command nvim . ; else command nvim "$@"; fi; }
+
+  # --- Aliases: Git ---
+  alias g='git'
+  alias gcm='git commit -m'
+  alias gcam='git commit -a -m'
+  alias gcad='git commit -a --amend'
+
+  # --- Functions: Compression ---
+  compress() { tar -czf "${1%/}.tar.gz" "${1%/}"; }
+  alias decompress="tar -xzf"
+
+  # --- Functions: Tmux layouts ---
+  tdl() {
+    [[ -z $1 ]] && { echo "Usage: tdl <ai_cmd> [<second_ai>]"; return 1; }
+    [[ -z $TMUX ]] && { echo "You must start tmux to use tdl."; return 1; }
+    local current_dir="${PWD}" editor_pane ai_pane ai2_pane ai="$1" ai2="$2"
+    editor_pane="$TMUX_PANE"
+    tmux rename-window -t "$editor_pane" "$(basename "$current_dir")"
+    tmux split-window -v -p 15 -t "$editor_pane" -c "$current_dir"
+    ai_pane=$(tmux split-window -h -p 30 -t "$editor_pane" -c "$current_dir" -P -F '#{pane_id}')
+    if [[ -n $ai2 ]]; then
+      ai2_pane=$(tmux split-window -v -t "$ai_pane" -c "$current_dir" -P -F '#{pane_id}')
+      tmux send-keys -t "$ai2_pane" "$ai2" C-m
+    fi
+    tmux send-keys -t "$ai_pane" "$ai" C-m
+    tmux send-keys -t "$editor_pane" "$EDITOR ." C-m
+    tmux select-pane -t "$editor_pane"
+  }
+
+  tdlm() {
+    [[ -z $1 ]] && { echo "Usage: tdlm <ai_cmd> [<second_ai>]"; return 1; }
+    [[ -z $TMUX ]] && { echo "You must start tmux to use tdlm."; return 1; }
+    local ai="$1" ai2="$2" base_dir="$PWD" first=true
+    tmux rename-session "$(basename "$base_dir" | tr '.:' '--')"
+    for dir in "$base_dir"/*/; do
+      [[ -d $dir ]] || continue
+      local dirpath="${dir%/}"
+      if $first; then
+        tmux send-keys -t "$TMUX_PANE" "cd '$dirpath' && tdl $ai $ai2" C-m
+        first=false
+      else
+        local pane_id=$(tmux new-window -c "$dirpath" -P -F '#{pane_id}')
+        tmux send-keys -t "$pane_id" "tdl $ai $ai2" C-m
+      fi
+    done
+  }
+
+  tsl() {
+    [[ -z $1 || -z $2 ]] && { echo "Usage: tsl <pane_count> <command>"; return 1; }
+    [[ -z $TMUX ]] && { echo "You must start tmux to use tsl."; return 1; }
+    local count="$1" cmd="$2" current_dir="${PWD}"
+    local -a panes
+    tmux rename-window -t "$TMUX_PANE" "$(basename "$current_dir")"
+    panes+=("$TMUX_PANE")
+    while (( ${#panes[@]} < count )); do
+      local new_pane
+      new_pane=$(tmux split-window -h -t "${panes[-1]}" -c "$current_dir" -P -F '#{pane_id}')
+      panes+=("$new_pane")
+      tmux select-layout -t "${panes[0]}" tiled
+    done
+    for pane in "${panes[@]}"; do tmux send-keys -t "$pane" "$cmd" C-m; done
+    tmux select-pane -t "${panes[0]}"
+  }
+
+  # --- Functions: Git worktrees ---
+  ga() {
+    [[ -z "$1" ]] && { echo "Usage: ga [branch name]"; return 1; }
+    local branch="$1" base wt_path
+    base="$(basename "$PWD")"
+    wt_path="../${base}--${branch}"
+    git worktree add -b "$branch" "$wt_path"
+    mise trust "$wt_path" 2>/dev/null || true
+    cd "$wt_path"
+  }
+
+  gd() {
+    if gum confirm "Remove worktree and branch?"; then
+      local cwd worktree root branch
+      cwd="$(pwd)"
+      worktree="$(basename "$cwd")"
+      root="${worktree%%--*}"
+      branch="${worktree#*--}"
+      if [[ "$root" != "$worktree" ]]; then
+        cd "../$root"
+        git worktree remove "$cwd" --force || return 1
+        git branch -D "$branch"
+      fi
+    fi
+  }
+
+  # --- Init ---
+  if command -v mise &>/dev/null; then
+    eval "$(mise activate bash)"
+  fi
+
+  if [[ $- == *i* ]] && [[ ${TERM:-} != "dumb" ]] && command -v starship &>/dev/null; then
+    eval "$(starship init bash)"
+  fi
+
+  if command -v zoxide &>/dev/null; then
+    eval "$(zoxide init bash)"
+  fi
+
+  if command -v fzf &>/dev/null; then
+    [[ -f "$(brew --prefix)/opt/fzf/shell/completion.bash" ]] && \
+      source "$(brew --prefix)/opt/fzf/shell/completion.bash"
+    [[ -f "$(brew --prefix)/opt/fzf/shell/key-bindings.bash" ]] && \
+      source "$(brew --prefix)/opt/fzf/shell/key-bindings.bash"
   fi
 fi
-
-. "$HOME/.local/bin/env"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-eval "$(starship init bash)"
-
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"

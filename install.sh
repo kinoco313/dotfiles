@@ -43,7 +43,6 @@ install_homebrew() {
   info "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-  # Add brew to PATH for this session
   if [ "$OS" = "macos" ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   else
@@ -67,14 +66,13 @@ install_packages() {
 # --- Symlinks ---
 create_symlinks() {
   info "Creating symlinks..."
+  mkdir -p "$HOME/.config"
 
   local configs=(
-    "zsh"
-    "sheldon"
     "nvim"
-    "wezterm"
     "tmux"
     "git"
+    "lazygit"
     "alacritty"
   )
 
@@ -86,12 +84,12 @@ create_symlinks() {
     "mako"
   )
 
-  # starship.toml (file, not directory)
+  # starship.toml is a file, not a directory
   ln -sfn "$DOTFILES_DIR/.config/starship.toml" "$HOME/.config/starship.toml"
+  ok "Linked .config/starship.toml"
 
   for dir in "${configs[@]}"; do
     if [ -d "$DOTFILES_DIR/.config/$dir" ]; then
-      mkdir -p "$HOME/.config"
       ln -sfn "$DOTFILES_DIR/.config/$dir" "$HOME/.config/$dir"
       ok "Linked .config/$dir"
     fi
@@ -115,48 +113,26 @@ create_symlinks() {
   ok "Symlinks created"
 }
 
-# --- Default Shell ---
+# --- Default Shell (bash 5.x via brew) ---
 set_default_shell() {
-  local zsh_path
-  zsh_path="$(command -v zsh)"
+  local bash_path
+  if [ "$OS" = "macos" ]; then
+    bash_path="$(brew --prefix)/bin/bash"
+  else
+    bash_path="$(command -v bash)"
+  fi
 
-  if [ "$SHELL" = "$zsh_path" ]; then
-    ok "zsh is already the default shell"
+  if [ "$SHELL" = "$bash_path" ]; then
+    ok "bash is already the default shell"
     return
   fi
 
-  info "Setting zsh as default shell..."
-  if ! grep -qF "$zsh_path" /etc/shells; then
-    echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+  info "Setting bash as default shell ($bash_path)..."
+  if ! grep -qF "$bash_path" /etc/shells; then
+    echo "$bash_path" | sudo tee -a /etc/shells >/dev/null
   fi
-  chsh -s "$zsh_path"
-  ok "Default shell set to zsh"
-}
-
-# --- Sheldon ---
-init_sheldon() {
-  if ! command -v sheldon &>/dev/null; then
-    warn "sheldon not found, skipping plugin init"
-    return
-  fi
-  info "Initializing sheldon plugins..."
-  sheldon lock
-  ok "Sheldon plugins locked"
-}
-
-# --- ZDOTDIR ---
-setup_zdotdir() {
-  local zshenv="$HOME/.zshenv"
-  local line='export ZDOTDIR="$HOME/.config/zsh"'
-
-  if [ -f "$zshenv" ] && grep -qF 'ZDOTDIR' "$zshenv"; then
-    ok "ZDOTDIR already set in .zshenv"
-    return
-  fi
-
-  info "Setting ZDOTDIR in ~/.zshenv..."
-  echo "$line" >> "$zshenv"
-  ok "ZDOTDIR configured"
+  chsh -s "$bash_path"
+  ok "Default shell set to bash"
 }
 
 # --- Main ---
@@ -166,12 +142,10 @@ main() {
   install_homebrew
   install_packages
   create_symlinks
-  setup_zdotdir
   set_default_shell
-  init_sheldon
   echo ""
   ok "dotfiles installation complete!"
-  info "Open a new terminal or run: exec zsh"
+  info "Open a new terminal or run: exec bash"
 }
 
 main "$@"
