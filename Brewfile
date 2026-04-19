@@ -34,4 +34,6 @@ brew "stow"       # symlink farm manager
 
 # --- macOS only (casks) ---
 cask "wezterm"
+cask "alacritty"
 cask "font-hack-nerd-font"
+cask "font-jetbrains-mono-nerd-font"

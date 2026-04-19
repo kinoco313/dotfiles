@@ -75,6 +75,15 @@ create_symlinks() {
     "wezterm"
     "tmux"
     "git"
+    "alacritty"
+  )
+
+  # Linux-only configs (Hyprland / Wayland ecosystem)
+  local linux_configs=(
+    "hypr"
+    "waybar"
+    "walker"
+    "mako"
   )
 
   # starship.toml (file, not directory)
@@ -87,6 +96,15 @@ create_symlinks() {
       ok "Linked .config/$dir"
     fi
   done
+
+  if [ "$OS" = "linux" ] || [ "$OS" = "ubuntu" ]; then
+    for dir in "${linux_configs[@]}"; do
+      if [ -d "$DOTFILES_DIR/.config/$dir" ]; then
+        ln -sfn "$DOTFILES_DIR/.config/$dir" "$HOME/.config/$dir"
+        ok "Linked .config/$dir (Linux only)"
+      fi
+    done
+  fi
 
   # .bashrc
   if [ -f "$DOTFILES_DIR/.bashrc" ]; then
