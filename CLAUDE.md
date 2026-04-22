@@ -20,7 +20,7 @@ dotfiles/
 │   │   └── lua/plugins/
 │   │       └── claude.lua  # Treesitter languages + lazygit.nvim
 │   ├── wezterm/            # WezTerm terminal config (Lua)
-│   ├── tmux/tmux.conf      # tmux config (Ctrl+a prefix, Catppuccin)
+│   ├── tmux/tmux.conf      # tmux config (Ctrl+Space prefix, Catppuccin)
 │   ├── git/
 │   │   ├── config          # Git config (delta, aliases, push.autoSetupRemote)
 │   │   └── ignore          # Global gitignore
@@ -34,7 +34,7 @@ dotfiles/
 - **Plugin management**: sheldon for zsh, lazy.nvim for Neovim
 - **Neovim**: LazyVim-based. Custom plugins in `.config/nvim/lua/plugins/`. Config in `.config/nvim/lua/config/`
 - **WezTerm**: Keybindings in `.config/wezterm/keybinds.lua`, default bindings disabled
-- **tmux**: Prefix is `Ctrl+a`, vi mode, mouse enabled
+- **tmux**: Prefix is `Ctrl+Space`, vi mode, mouse enabled
 - **Git**: delta as pager (side-by-side diffs), push.autoSetupRemote enabled
 - **Zsh aliases**: `ls`→`eza`, `cat`→`bat`, `grep`→`rg`, `cd`→`z`, `lg`→`lazygit`
 - **Lua formatting**: StyLua — 2-space indent, 120 column width (`.config/nvim/stylua.toml`)
@@ -171,7 +171,7 @@ Node Version Manager loads on first `nvm` command to improve shell startup time.
 
 ### WezTerm + tmux
 - **WezTerm**: GPU-accelerated terminal emulator (custom keybinds in `.config/wezterm/keybinds.lua`)
-- **tmux**: Terminal multiplexer inside WezTerm (prefix: `Ctrl+a`)
+- **tmux**: Terminal multiplexer inside WezTerm (prefix: `Ctrl+Space`)
 - Can be used independently or together (tmux for session persistence, WezTerm for rendering)
 
 ## Gotchas

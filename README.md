@@ -64,7 +64,7 @@ dotfiles/
 
 ## Key Bindings
 
-### tmux (prefix: `Ctrl+a`)
+### tmux (prefix: `Ctrl+Space`)
 
 | Key | Action |
 |-----|--------|
