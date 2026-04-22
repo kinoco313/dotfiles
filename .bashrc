@@ -10,7 +10,7 @@ else
   # macOS: replicate Omarchy's environment manually
 
   # --- Env ---
-  export BAT_THEME=ansi
+  export BAT_THEME="Catppuccin Mocha"
   export PATH="$PATH:$HOME/.local/bin"
 
   # Homebrew env (Apple Silicon path)

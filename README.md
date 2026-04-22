@@ -1,16 +1,20 @@
 # dotfiles
 
-Personal dotfiles optimized for Claude Code workflow. Ubuntu/macOS cross-platform.
+Personal dotfiles optimized for Claude Code workflow. Linux (Omarchy/Hyprland) + macOS cross-platform.
 
 ## What's Included
 
-- **zsh** + sheldon (autosuggestions, syntax highlighting, completions)
+- **bash** shell config (delegates to Omarchy on Linux, standalone on macOS)
+- **Hyprland** window manager configs (bindings, autostart, idle, lock, look & feel)
+- **Waybar** status bar
+- **Alacritty** terminal emulator
 - **Neovim** (LazyVim) + lazygit.nvim, treesitter
-- **WezTerm** terminal emulator
 - **tmux** with Catppuccin Mocha theme
 - **Git** with delta (side-by-side diffs), useful aliases
-- **Starship** prompt (Catppuccin Mocha)
-- Modern CLI: `eza`, `bat`, `ripgrep`, `fd`, `zoxide`, `fzf`, `direnv`, `gh`
+- **Starship** prompt
+- **Walker** app launcher
+- **Mako** notification daemon
+- Modern CLI: `eza`, `bat`, `ripgrep`, `fd`, `zoxide`, `fzf`, `lazygit`, `gh`, `direnv`, `mise`
 
 ## Quick Start
 
@@ -21,12 +25,10 @@ bash install.sh
 ```
 
 The install script will:
-1. Detect your OS (macOS / Ubuntu)
+1. Detect your OS (macOS / Linux)
 2. Install Homebrew if needed
 3. Install all packages via `brew bundle`
 4. Create symlinks to `~/.config/`
-5. Set zsh as default shell
-6. Initialize sheldon plugins
 
 ## Structure
 
@@ -34,12 +36,26 @@ The install script will:
 dotfiles/
 ├── install.sh                  # Bootstrap script
 ├── Brewfile                    # Homebrew packages
-├── .bashrc                     # Bash config (fallback)
+├── .bashrc                     # Bash config (delegates to Omarchy on Linux)
 ├── .config/
-│   ├── zsh/.zshrc              # Zsh config
-│   ├── sheldon/plugins.toml    # Zsh plugins
+│   ├── hypr/                   # Hyprland WM config
+│   │   ├── hyprland.conf       # Main config
+│   │   ├── bindings.conf       # Keybindings
+│   │   ├── autostart.conf      # Autostart apps
+│   │   ├── hypridle.conf       # Idle management
+│   │   ├── hyprlock.conf       # Lock screen
+│   │   ├── hyprsunset.conf     # Night light
+│   │   ├── input.conf          # Input devices
+│   │   ├── looknfeel.conf      # Theme/appearance
+│   │   ├── monitors.conf       # Monitor layout
+│   │   └── xdph.conf           # XDG desktop portal
+│   ├── waybar/                 # Status bar
+│   │   ├── config.jsonc        # Modules config
+│   │   └── style.css           # Styling
+│   ├── alacritty/alacritty.toml# Terminal emulator
+│   ├── walker/                 # App launcher
+│   ├── mako/                   # Notifications
 │   ├── nvim/                   # Neovim (LazyVim)
-│   ├── wezterm/                # WezTerm
 │   ├── tmux/tmux.conf          # tmux
 │   ├── git/config              # Git + delta
 │   ├── git/ignore              # Global gitignore
@@ -58,7 +74,7 @@ dotfiles/
 | `c` | New window |
 | `r` | Reload config |
 
-### Zsh Aliases
+### Bash Aliases
 
 | Alias | Command |
 |-------|---------|
