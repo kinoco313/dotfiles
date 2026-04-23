@@ -32,3 +32,5 @@ node_modules/
 
 # Zsh
 .zcompdump*
+.zsh_history
+.config/zsh/

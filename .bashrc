@@ -21,7 +21,6 @@ else
   HISTCONTROL=ignoreboth
   HISTSIZE=32768
   HISTFILESIZE="${HISTSIZE}"
-  set +h
 
   if [[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]]; then
     source "$(brew --prefix)/etc/profile.d/bash_completion.sh"
