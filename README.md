@@ -68,11 +68,16 @@ dotfiles/
 
 | Key | Action |
 |-----|--------|
-| `\|` | Split horizontal |
-| `-` | Split vertical |
-| `h/j/k/l` | Navigate panes |
+| `v` | Split pane vertically (left/right) |
+| `h` | Split pane horizontally (top/bottom) |
+| `Ctrl+Alt+↑/↓/←/→` | Navigate panes |
+| `x` | Kill pane |
 | `c` | New window |
-| `r` | Reload config |
+| `k` | Kill window |
+| `r` | Rename window |
+| `q` | Reload config |
+| `Alt+1~9` | Switch window by number |
+| `Alt+←/→` | Switch window prev/next |
 
 ### Bash Aliases
 

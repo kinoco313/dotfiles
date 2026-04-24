@@ -15,8 +15,7 @@ size = 16
 [window]
 padding.x = 16
 padding.y = 16
-dimensions = { columns = 120, lines = 36 }
-position = { x = 100, y = 100 }
+startup_mode = "Fullscreen"
 decorations = "None"
 
 [terminal.shell]
