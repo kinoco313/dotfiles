@@ -3,8 +3,9 @@
 # Usage: brew bundle --file=Brewfile
 # ===========================================
 
-# --- Shell ---
-brew "bash"           # bash 5.x (macOS ships with ancient 3.2)
+# --- Shell & Prompt ---
+brew "zsh"
+brew "sheldon"        # zsh plugin manager
 brew "starship"       # prompt
 
 # --- Modern CLI Replacements ---
@@ -33,7 +34,8 @@ brew "mise"           # runtime version manager (replaces nvm/rbenv/etc)
 
 # --- Utilities ---
 brew "direnv"         # per-project env vars
+brew "stow"           # symlink farm manager
 
 # --- macOS only (casks) ---
-cask "alacritty"
-cask "font-jetbrains-mono-nerd-font"
+cask "wezterm"
+cask "font-hack-nerd-font"

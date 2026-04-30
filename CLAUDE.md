@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Personal dotfiles repository inspired by [Omarchy](https://omarchy.org/). Supports Linux (Omarchy/Hyprland) and macOS with Homebrew. Shell is **bash**. Terminal is **Alacritty**. Includes configuration for: Neovim (LazyVim), tmux, Git (delta), Starship prompt, and various modern CLI tools.
+Personal dotfiles repository inspired by [Omarchy](https://omarchy.org/). Supports Linux (Omarchy/Hyprland) and macOS with Homebrew. Shell is **zsh** (managed by sheldon). Terminal is **WezTerm**. Includes configuration for: Neovim (LazyVim), tmux, Git (delta), Starship prompt, and various modern CLI tools.
 
 ## Repository Structure
 
@@ -12,10 +12,9 @@ Personal dotfiles repository inspired by [Omarchy](https://omarchy.org/). Suppor
 dotfiles/
 ├── install.sh              # Bootstrap script (OS detection, brew, symlinks)
 ├── Brewfile                # Declarative Homebrew packages
-├── .bashrc                 # Bash shell config (Linux delegates to Omarchy, macOS standalone)
 ├── .config/
-│   ├── alacritty/          # Alacritty terminal config
-│   ├── zsh/                # Zsh config (kept for reference / fallback)
+│   ├── wezterm/            # WezTerm terminal config (wezterm.lua, keybinds.lua)
+│   ├── zsh/                # Zsh config (.zshrc — ZDOTDIR points here)
 │   ├── nvim/               # Neovim (LazyVim)
 │   │   └── lua/plugins/
 │   │       └── claude.lua  # Treesitter languages + lazygit.nvim
@@ -33,14 +32,14 @@ dotfiles/
 
 ## Key Conventions
 
-- **Theme**: Catppuccin Mocha palette across Starship, tmux, Alacritty, and editor
-- **Shell**: bash (`.bashrc`) — Linux delegates to Omarchy's managed config
-- **Terminal**: Alacritty
+- **Theme**: Catppuccin Mocha palette across Starship, tmux, WezTerm, and editor
+- **Shell**: zsh — sheldon manages plugins, ZDOTDIR=`~/.config/zsh`
+- **Terminal**: WezTerm
 - **Plugin management**: lazy.nvim for Neovim
 - **Neovim**: LazyVim-based. Custom plugins in `.config/nvim/lua/plugins/`. Config in `.config/nvim/lua/config/`
 - **tmux**: Prefix is `Ctrl+Space`, vi mode, mouse enabled
 - **Git**: delta as pager (side-by-side diffs), push.autoSetupRemote enabled
-- **Bash aliases**: `ls`→`eza`, `cd`→`zd` (zoxide wrapper), `ff`→fzf+bat preview, `cx`→claude skip-permissions
+- **Zsh aliases**: `ls`→`eza`, `cd`→`z` (zoxide), `cat`→`bat`, `grep`→`rg`, `lg`→lazygit
 
 ## CLI Tools
 
@@ -65,11 +64,11 @@ dotfiles/
 git clone https://github.com/kkaoioi/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 bash install.sh
-exec bash
+exec zsh
 ```
 
 **Verify Installation:**
-- `echo $SHELL` → should show bash path
+- `echo $SHELL` → should show zsh path
 - `which eza bat rg fd` → all should resolve
 - `nvim --version` → should show Neovim installed
 - `tmux -V` → should show tmux version
@@ -90,8 +89,8 @@ brew update && brew upgrade
 ### Test Changes
 Before committing config changes:
 ```bash
-# For bash changes
-exec bash
+# For zsh changes
+exec zsh
 
 # For tmux changes
 tmux source ~/.config/tmux/tmux.conf
@@ -105,7 +104,7 @@ tmux source ~/.config/tmux/tmux.conf
 cd ~/dotfiles
 git pull
 bash install.sh
-exec bash
+exec zsh
 ```
 
 ## Customization
@@ -119,7 +118,7 @@ exec bash
 Current: Catppuccin Mocha
 - Starship: `.config/starship.toml`
 - tmux: `.config/tmux/tmux.conf` (catppuccin plugin section)
-- Alacritty: `.config/alacritty/`
+- WezTerm: `.config/wezterm/wezterm.lua`
 - Neovim: LazyVim colorscheme config
 
 ### Add Homebrew Package
@@ -131,11 +130,10 @@ Current: Catppuccin Mocha
 
 ### Key Environment Variables (macOS)
 - `BAT_THEME="Catppuccin Mocha"` - bat color theme
-- `NVM_DIR="$HOME/.nvm"` - nvm (superseded by mise on new installs)
 
 ### Directory Structure
 - `~/.config/` - All dotfile configs (symlinked from `~/dotfiles/.config/`)
-- `~/.bashrc` - Main shell config (symlinked from `~/dotfiles/.bashrc`)
+- `~/.zshenv` - Sets `ZDOTDIR="$HOME/.config/zsh"` (written by install.sh)
 
 ## Tool Integration
 
@@ -154,14 +152,11 @@ Current: Catppuccin Mocha
 - `gd` — removes current worktree and deletes branch (with gum confirmation)
 
 ### mise (Runtime Manager)
-Replaces nvm/rbenv. Activated in `.bashrc` via `mise activate bash`.
-
-### Linux (Omarchy)
-On Linux, `.bashrc` sources `~/.local/share/omarchy/default/bash/rc` and delegates all config to Omarchy. GPG agent is used as SSH agent.
+Replaces nvm/rbenv. Activated in `.config/zsh/.zshrc` via `mise activate zsh`.
 
 ## Gotchas
 
 - **Symlinks overwrite**: `install.sh` will replace existing configs in `~/.config/`. Back up first if needed.
 - **Linux limitations**: Homebrew casks (GUI apps) are skipped on Ubuntu/Debian.
-- **New terminal required**: After install, run `exec bash` or open a new terminal to load changes.
-- **zd vs z**: The `cd` alias points to `zd`, a wrapper that handles `cd ~`, real directories, and zoxide fallback with a visual indicator.
+- **New terminal required**: After install, run `exec zsh` or open a new terminal to load changes.
+- **ZDOTDIR**: `.zshrc` lives at `~/.config/zsh/.zshrc`. `~/.zshenv` must set `ZDOTDIR` for zsh to find it (handled by install.sh).
